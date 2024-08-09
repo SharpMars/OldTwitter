@@ -1,3 +1,6 @@
+>  # Fork Info:
+> This forks adds ability to download JSON of all your bookmarks. Just press "Download all" button on bookmark page. Progress is only shown in dev tools. On complete new page will be open containing the data. In case your browser blocks the popup tab, you should allow it to open.
+
 # OldTwitter (2024)
 Browser extension to return old Twitter layout from 2015 (and option to use 2018 design).  
 This extension doesn't add any CSS on top of original Twitter. It's fully original client that replaces Twitter, making it much faster than alternatives.
