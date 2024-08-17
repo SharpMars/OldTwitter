@@ -219,7 +219,7 @@ setTimeout(async () => {
         console.log(
           `next iteration ${downloadBookmarkCursor}\ncurrent count: ${downloadBookmarks.length}\ndownload end: ${downloadEnd}`
         );
-        await timer(5000);
+        await timer(5000 + Math.random() * 3000);
         let newBookmarks;
         try {
           newBookmarks = await API.bookmarks.get(downloadBookmarkCursor);
