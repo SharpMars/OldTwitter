@@ -3,6 +3,7 @@ let solveCallbacks = {};
 let solveQueue = []
 let solverReady = false;
 let solverErrored = false;
+let sentData = false;
 
 let solverIframe = document.createElement('iframe');
 solverIframe.style.display = 'none';
@@ -17,7 +18,7 @@ if(injectedBody) {
             injectedBody.appendChild(solverIframe);
             clearInterval(int);
         }
-    }, 30);
+    }, 10);
 }
 
 function solveChallenge(path, method) {
@@ -28,7 +29,7 @@ function solveChallenge(path, method) {
         }
         let id = solveId++;
         solveCallbacks[id] = { resolve, reject, time: Date.now() };
-        if(!solverIframe || !solverIframe.contentWindow || !solverReady) {
+        if(!solverReady || !solverIframe || !solverIframe.contentWindow) {
             solveQueue.push({ id, path, method })
         } else {
             try {
@@ -46,6 +47,18 @@ function solveChallenge(path, method) {
         }
     });
 }
+
+setInterval(() => {
+    if(!document.getElementById('loading-box').hidden && sentData && solveQueue.length) {
+        console.log("Something's wrong with the challenge solver, reloading", solveQueue);
+        solverIframe.remove();
+        solverIframe = document.createElement('iframe');
+        solverIframe.style.display = 'none';
+        solverIframe.src = chrome.runtime.getURL(`sandbox.html`);
+        document.getElementById('injected-body').appendChild(solverIframe);
+        initChallenge();
+    }
+}, 2000);
 
 window.addEventListener('message', e => {
     if(e.source !== solverIframe.contentWindow) return;
@@ -150,6 +163,8 @@ async function initChallenge() {
         OLDTWITTER_CONFIG.verificationKey = verificationKey;
 
         function sendInit() {
+            sentData = true;
+            if(!solverIframe || !solverIframe.contentWindow) return setTimeout(sendInit, 50);
             solverIframe.contentWindow.postMessage({
                 action: 'init',
                 code: challengeData,
@@ -158,11 +173,7 @@ async function initChallenge() {
                 verificationCode: OLDTWITTER_CONFIG.verificationKey
             }, '*');
         }
-        if(solverIframe.contentWindow) {
-            sendInit();
-        } else {
-            solverIframe.addEventListener('load', () => sendInit());
-        }
+        setTimeout(sendInit, 50);
         return true;
     } catch (e) {
         console.error(`Error during challenge init:`);
