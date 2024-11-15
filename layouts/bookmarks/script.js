@@ -203,6 +203,8 @@ setTimeout(async () => {
       let downloadBookmarks;
       let downloadBookmarkCursor = null;
       let downloadEnd = false;
+      const downloadCap = document.getElementById("download-cap").valueAsNumber;
+
       try {
         downloadBookmarks = await API.bookmarks.get(downloadBookmarkCursor);
       } catch (e) {
@@ -215,7 +217,10 @@ setTimeout(async () => {
 
       console.log("starting loop");
 
-      while (!downloadEnd) {
+      while (
+        !downloadEnd &&
+        (downloadCap == -1 ? true : downloadBookmarks.length <= downloadCap)
+      ) {
         console.log(
           `next iteration ${downloadBookmarkCursor}\ncurrent count: ${downloadBookmarks.length}\ndownload end: ${downloadEnd}`
         );
