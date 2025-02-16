@@ -243,6 +243,9 @@ setTimeout(async () => {
         downloadBookmarks = downloadBookmarks.concat(newBookmarks.list);
       }
 
+      if(downloadCap !== -1)
+        downloadBookmarks = downloadBookmarks.slice(0, downloadCap);
+
       window.open(
         URL.createObjectURL(
           new Blob([JSON.stringify(downloadBookmarks, getCircularReplacer())], {
